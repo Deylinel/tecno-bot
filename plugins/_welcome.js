@@ -4,59 +4,65 @@ import fetch from 'node-fetch';
 export async function before(m, { conn, participants, groupMetadata }) {
   if (!m.messageStubType || !m.isGroup) return true;
 
-  // Obtener imagen de perfil o usar imagen por defecto
-  const defaultImg = 'https://i.ibb.co/V3Hsgcy/file.jpg';
-  const pp = await conn.profilePictureUrl(m.messageStubParameters[0], 'image').catch(() => defaultImg);
-  const img = await (await fetch(pp)).buffer();
+  const img = imagen1; // Imagen personalizada
+  const chat = global.db.data.chats[m.chat];
 
-  // Variables globales (asegúrate de definirlas en tu entorno)
-  const botname = "TechBot"; // Nombre del bot
-  const canal = "https://t.me/TechChannel"; // Enlace del canal o información del bot
-  const estilo = "dark-mode"; // Estilo visual (puedes personalizarlo)
-  const textbot = "🤖 *Asistente tecnológico activado*";
+  if (chat.welcome) {
+    const userTag = `@${m.messageStubParameters[0].split`@`[0]}`;
+    const groupName = groupMetadata.subject;
 
-  // Función para enviar mensajes con estilo
-  async function sendStyledMessage(chatId, title, body, img) {
-    const message = `
-╭━━━━━━━━━━━━━━━━━━━━━━━╮
-┃        ${title}
-┣━━━━━━━━━━━━━━━━━━━━━━━┫
-${body}
-╰━━━━━━━━━━━━━━━━━━━━━━━╯
-`;
-    await conn.sendMessage(chatId, { image: img, caption: message });
-  }
+    if (m.messageStubType === 27) { // Bienvenida
+      const welcomeMessage = `
+╭━━━━━━━━━━━━━━━━━━━━━╮
+┃   🌐 *TECNO-BOT* 🌐  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🚀 *ACCESS GRANTED*  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🤖 *User:* ${userTag}  
+┃ 🛸 *Group:* ${groupName}  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🎉 _Welcome to the Techverse!_  
+┃ ✨ _Enjoy the experience._  
+╰━━━━━━━━━━━━━━━━━━━━━╯  
 
-  // Mensajes de bienvenida
-  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_ADD) {
-    const bienvenida = `
-┌──────── ✦ ✧ ✦ ────────┐
-│ 🌟 ¡Hola, @${m.messageStubParameters[0].split`@`[0]}!
-│ 🛸 Bienvenido a *${groupMetadata.subject}*
-│ 📜 Por favor, revisa las reglas y
-│ disfruta de la experiencia 🚀.
-└────────────────────────┘
-🔗 Más info: ${canal}`;
-    await sendStyledMessage(m.chat, `🔵 ${botname} | Bienvenido`, bienvenida, img);
-  }
+      `;
+      await conn.sendLuffy(m.chat, packname, textbot, welcomeMessage, img, img, redes, fkontak);
+    }
 
-  // Mensajes de despedida
-  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_REMOVE) {
-    const despedida = `
-┌──────── ✦ ✧ ✦ ────────┐
-│ 👋 Adiós, @${m.messageStubParameters[0].split`@`[0]}.
-│ 🌌 ¡Que encuentres nuevos horizontes!
-└────────────────────────┘`;
-    await sendStyledMessage(m.chat, `🔴 ${botname} | Hasta luego`, despedida, img);
-  }
+    if (m.messageStubType === 28) { // Despedida
+      const goodbyeMessage = `
+╭━━━━━━━━━━━━━━━━━━━━━╮
+┃   🌐 *TECNO-BOT* 🌐  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🚪 *USER DEPARTURE*  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🤖 *User:* ${userTag}  
+┃ 🛸 *Group:* ${groupName}  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🌌 _Goodbye, traveler._  
+┃ ✨ _Your journey continues elsewhere._  
+╰━━━━━━━━━━━━━━━━━━━━━╯  
 
-  // Mensajes de expulsión
-  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
-    const expulsion = `
-┌──────── ✦ ✧ ✦ ────────┐
-│ 🚪 Usuario @${m.messageStubParameters[0].split`@`[0]} ha sido expulsado.
-│ 🛠️ Mantenemos el grupo seguro.
-└────────────────────────┘`;
-    await sendStyledMessage(m.chat, `⚠️ ${botname} | Expulsión`, expulsion, img);
+      `;
+      await conn.sendLuffy(m.chat, packname, textbot, goodbyeMessage, img, img, redes, fkontak);
+    }
+
+    if (m.messageStubType === 32) { // Expulsión
+      const kickMessage = `
+╭━━━━━━━━━━━━━━━━━━━━━╮
+┃   🌐 *TECNO-BOT* 🌐  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ ⛔ *ACCESS REVOKED*  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🤖 *User:* ${userTag}  
+┃ 🛸 *Group:* ${groupName}  
+┣━━━━━━━━━━━━━━━━━━━━━┫
+┃ 🔒 _User removed for group integrity._  
+┃ ✨ _Security protocol enforced._  
+╰━━━━━━━━━━━━━━━━━━━━━╯  
+
+      `;
+      await conn.sendLuffy(m.chat, packname, textbot, kickMessage, img, img, redes, fkontak);
+    }
   }
 }
