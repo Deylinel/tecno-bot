@@ -4,21 +4,21 @@ import path from 'path';
 let handler = async (m, { conn, isRowner }) => {
 
 let time = global.db.data.users[m.sender].lastmiming + 60000
-if (new Date - global.db.data.users[m.sender].lastmiming < 60000) return conn.reply(m.chat, `⛄ Debes esperar ${msToTime(time - new Date())} para poder cambiar la foto del bot.`, m);
+if (new Date - global.db.data.users[m.sender].lastmiming < 60000) return conn.reply(m.chat, `⚙️ Debes esperar ${msToTime(time - new Date())} para poder cambiar la foto del bot.`, m);
 
   try {
 
     const media = await m.quoted.download();
 
     if (!isImageValid(media)) {
-      return m.reply('🌲 El archivo enviado no es una imagen válida.');
+      return m.reply('🚀 El archivo enviado no es una imagen válida.');
     }
     global.imagen1 = /Menu.jpg;
     global.imagen2 = /Menu2.jpg;  
     global.imagen3 = /Menu3.jpg;
     global.icono = media;
 
-    m.reply('❄️ El banner fue actualizado');
+    m.reply('🌐 El banner fue actualizado');
 
   } catch (error) {
     console.error(error);
