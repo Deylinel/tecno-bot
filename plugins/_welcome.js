@@ -1,24 +1,62 @@
-import {WAMessageStubType} from '@whiskeysockets/baileys'
-import fetch from 'node-fetch'
+import { WAMessageStubType } from '@whiskeysockets/baileys';
+import fetch from 'node-fetch';
 
-export async function before(m, {conn, participants, groupMetadata}) {
-  if (!m.messageStubType || !m.isGroup) return !0;
-  let pp = await conn.profilePictureUrl(m.messageStubParameters[0], 'image').catch(_ => 'https://i.ibb.co/V3Hsgcy/file.jpg')
-  let img = await (await fetch(`${pp}`)).buffer()
-  let chat = global.db.data.chats[m.chat]
+export async function before(m, { conn, participants, groupMetadata }) {
+  if (!m.messageStubType || !m.isGroup) return true;
 
-  if (chat.bienvenida && m.messageStubType == 27) {
-    let bienvenida = `┌─★ *${botname}* \n│「 Bienvenido 」\n└┬★ 「 @${m.messageStubParameters[0].split`@`[0]} 」\n   │✑  Bienvenido a\n   │✑  ${groupMetadata.subject}\n   └───────────────┈ ⳹`
+  // Obtener imagen de perfil o usar imagen por defecto
+  const defaultImg = 'https://i.ibb.co/V3Hsgcy/file.jpg';
+  const pp = await conn.profilePictureUrl(m.messageStubParameters[0], 'image').catch(() => defaultImg);
+  const img = await (await fetch(pp)).buffer();
 
-await conn.sendAi(m.chat, botname, textbot, bienvenida, img, img, canal, estilo)
+  // Variables globales (asegúrate de definirlas en tu entorno)
+  const botname = "TechBot"; // Nombre del bot
+  const canal = "https://t.me/TechChannel"; // Enlace del canal o información del bot
+  const estilo = "dark-mode"; // Estilo visual (puedes personalizarlo)
+  const textbot = "🤖 *Asistente tecnológico activado*";
+
+  // Función para enviar mensajes con estilo
+  async function sendStyledMessage(chatId, title, body, img) {
+    const message = `
+╭━━━━━━━━━━━━━━━━━━━━━━━╮
+┃        ${title}
+┣━━━━━━━━━━━━━━━━━━━━━━━┫
+${body}
+╰━━━━━━━━━━━━━━━━━━━━━━━╯
+`;
+    await conn.sendMessage(chatId, { image: img, caption: message });
   }
 
-  if (chat.bienvenida && m.messageStubType == 28) {
-    let bye = `┌─★ *${botname}* \n│「 ADIOS 👋 」\n└┬★ 「 @${m.messageStubParameters[0].split`@`[0]} 」\n   │✑  Se fue\n   │✑ Jamás te quisimos aquí\n   └───────────────┈ ⳹`
-await conn.sendAi(m.chat, botname, textbot, bye, img, img, canal, estilo)
+  // Mensajes de bienvenida
+  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_ADD) {
+    const bienvenida = `
+┌──────── ✦ ✧ ✦ ────────┐
+│ 🌟 ¡Hola, @${m.messageStubParameters[0].split`@`[0]}!
+│ 🛸 Bienvenido a *${groupMetadata.subject}*
+│ 📜 Por favor, revisa las reglas y
+│ disfruta de la experiencia 🚀.
+└────────────────────────┘
+🔗 Más info: ${canal}`;
+    await sendStyledMessage(m.chat, `🔵 ${botname} | Bienvenido`, bienvenida, img);
   }
 
-  if (chat.bienvenida && m.messageStubType == 32) {
-    let kick = `┌─★ *${botname}* \n│「 ADIOS 👋 」\n└┬★ 「 @${m.messageStubParameters[0].split`@`[0]} 」\n   │✑  Se fue\n   │✑ Jamás te quisimos aquí\n   └───────────────┈ ⳹`
-await conn.sendAi(m.chat, botname, textbot, kick, img, img, canal, estilo)
-}}
+  // Mensajes de despedida
+  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_REMOVE) {
+    const despedida = `
+┌──────── ✦ ✧ ✦ ────────┐
+│ 👋 Adiós, @${m.messageStubParameters[0].split`@`[0]}.
+│ 🌌 ¡Que encuentres nuevos horizontes!
+└────────────────────────┘`;
+    await sendStyledMessage(m.chat, `🔴 ${botname} | Hasta luego`, despedida, img);
+  }
+
+  // Mensajes de expulsión
+  if (chat.bienvenida && m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_LEAVE) {
+    const expulsion = `
+┌──────── ✦ ✧ ✦ ────────┐
+│ 🚪 Usuario @${m.messageStubParameters[0].split`@`[0]} ha sido expulsado.
+│ 🛠️ Mantenemos el grupo seguro.
+└────────────────────────┘`;
+    await sendStyledMessage(m.chat, `⚠️ ${botname} | Expulsión`, expulsion, img);
+  }
+}
