@@ -1,16 +1,11 @@
-import fs from 'fs'
-import FormData from 'form-data'
-import axios from 'axios'
-import fetch from 'node-fetch'
-
 let handler = async (m, { conn }) => {
 
   let q = m.quoted ? m.quoted : m
   let mime = (q.msg || q).mimetype || ''
 
-  await m.react('⌛')
+  await m.react('🕒')
   if (!mime.startsWith('image/')) {
-    return m.reply('⚠️ *ERROR DE FORMATO*: Este comando requiere que respondas a una imagen. Inténtalo de nuevo.')
+    return m.reply('¡Responde a una *IMAGEN*! 🔥')
   }
 
   let media = await q.download()
@@ -25,20 +20,19 @@ let handler = async (m, { conn }) => {
 
   await m.react('✅')
   if (api.data.data) {
-    let txt = '🛰️ `TECNO-BOT`\n\n'
-        txt += `📂 *TÍTULO*: ${q.filename || 'Archivo_Desconocido'}\n`
-        txt += `🆔 *ID*: ${api.data.data.id}\n`
-        txt += `🔗 *ENLACE*: ${api.data.data.url}\n`
-        txt += `🌐 *DIRECTO*: ${api.data.data.url_viewer}\n`
-        txt += `📄 *MIME*: ${mime}\n`
-        txt += `📁 *ARCHIVO*: ${q.filename || 'archivo.jpg'}\n`
-        txt += `🖼️ *EXTENSIÓN*: ${api.data.data.image.extension}\n`
-        txt += `🗑️ *ELIMINAR*: ${api.data.data.delete_url}\n\n`
-        txt += `🚀 *Servicio ofrecido por*: ${botname}`
+    let txt = '【 I B B - U P L O A D E R 】\n\n'
+        txt += `🚀 *🧊 TÍTULO:* ${q.filename || 'x'}\n`
+        txt += `⚡ *🔑 ID:* ${api.data.data.id}\n`
+        txt += `🌐 *🔗 ENLACE:* ${api.data.data.url}\n`
+        txt += `📲 *🔴 DIRECTO:* ${api.data.data.url_viewer}\n`
+        txt += `🖥️ *🧬 MIME:* ${mime}\n`
+        txt += `💾 *📝 ARCHIVO:* ${q.filename || 'x.jpg'}\n`
+        txt += `🔧 *💡 EXTENSIÓN:* ${api.data.data.image.extension}\n`
+        txt += `🛠️ *❌ ELIMINAR:* ${api.data.data.delete_url}\n\n`
+        txt += `*➤ By: ${botname}*`
     await conn.sendFile(m.chat, api.data.data.url, 'ibb.jpg', txt, m, null, fake)
   } else {
-    await m.react('❌')
-    m.reply('⚠️ *ERROR*: Algo salió mal al intentar subir la imagen. Por favor, inténtalo nuevamente.')
+    await m.react('✅')
   }
 }
 handler.tags = ['convertir']
